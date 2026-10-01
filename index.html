@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>KanzleiZeit · Zeiterfassung</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header><div class="brand"><span class="logo">KZ</span><div>KanzleiZeit<small>ZEITERFASSUNG FÜR STEUERBERATER</small></div></div><span class="badge">Erste Version · lokal gespeichert</span></header>
+<main>
+<div class="intro"><div><p class="eyebrow">IHR ARBEITSTAG IM ÜBERBLICK</p><h1>Zeit für das Wesentliche.</h1><p>Leistungen erfassen. Mandanten zuordnen. Den Überblick behalten.</p></div><span class="date" id="current-date"></span></div>
+<div class="notice">Prototyp: Bitte nur fiktive Daten verwenden. Ihre Einträge bleiben in diesem Browser. CSV-Exporte regelmäßig sichern.</div>
+<div id="message" role="status" aria-live="polite"></div>
+<section class="stats" aria-label="Auswertung der gefilterten Einträge"><article><span>Erfasste Zeit</span><strong id="total">0 Std. 0 Min.</strong><small>Aktuelle Auswahl</small></article><article><span>Abrechenbare Zeit</span><strong id="billable">0 Std. 0 Min.</strong><small>Aktuelle Auswahl</small></article><article><span>Zeiteinträge</span><strong id="count">0</strong><small>Aktuelle Auswahl</small></article></section>
+<div class="workspace">
+<section class="panel"><div class="section-heading"><h2 id="form-title">Zeit erfassen</h2><span class="step">01</span></div>
+<form id="entry-form">
+<label>Mandant<select id="client" required><option value="">Bitte auswählen</option></select></label>
+<div class="pair"><label>Datum<input id="date" type="date" required></label><label>Dauer in Minuten<input id="minutes" type="number" min="1" max="1440" step="1" placeholder="z. B. 45" required></label></div>
+<label>Tätigkeit<select id="activity" required></select></label>
+<label>Mitarbeiter<input id="employee" maxlength="120" placeholder="Vor- und Nachname" required></label>
+<label>Leistungsbeschreibung<textarea id="description" rows="3" maxlength="2000" placeholder="Was haben Sie erledigt?"></textarea></label>
+<label class="checkbox"><input id="billable-input" type="checkbox" checked> Abrechenbare Leistung</label>
+<div class="actions"><button type="submit" id="save">Eintrag speichern</button><button class="secondary" type="button" id="cancel" hidden>Abbrechen</button></div>
+</form>
+<div class="client-section"><h3>Mandanten verwalten</h3><form id="client-form"><label>Neuer Mandant<input id="client-name" maxlength="120" placeholder="z. B. Muster GmbH" required></label><button class="secondary" type="submit">Mandant hinzufügen</button></form><p id="client-count" class="muted"></p></div>
+</section>
+<section class="panel records"><div class="section-heading"><div><h2>Leistungsübersicht</h2><p class="muted">Alle Einträge an einem Ort.</p></div><button class="secondary" id="export" type="button">CSV exportieren</button></div>
+<div class="filters"><label>Mandant<select id="filter-client"><option value="">Alle Mandanten</option></select></label><label>Von<input id="from" type="date"></label><label>Bis<input id="to" type="date"></label><button class="text-button" id="reset-filters" type="button">Zurücksetzen</button></div>
+<div class="table-scroll"><table><thead><tr><th>Datum / Mandant</th><th>Leistung</th><th>Dauer</th><th>Aktionen</th></tr></thead><tbody id="entries"></tbody></table></div>
+<div id="empty" class="empty"><span>◷</span><h3>Noch keine Zeiten erfasst</h3><p>Legen Sie einen Mandanten an und erfassen Sie Ihre erste Leistung.</p></div>
+<div class="summary"><h3>Zeit je Mandant</h3><div id="client-summary"></div></div>
+</section>
+</div>
+<footer>KanzleiZeit · Version 0.1 <span>Lokale Speicherung · Keine gemeinsame Kanzleidatenbank</span></footer>
+</main><script type="module" src="/app.js"></script>
+</body></html>
