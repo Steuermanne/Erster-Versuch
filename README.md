@@ -32,7 +32,7 @@ Die Anwendung soll den täglichen Aufwand der Zeiterfassung reduzieren und einen
 
 1. Mandanten und Tätigkeiten verwalten.
 2. Arbeitszeiten manuell erfassen und in einer Liste anzeigen.
-3. Zeiteinträge bearbeiten und nach Mandant oder Zeitraum filtern.
+3. Zeiteinträge bearbeiten und nach Mandant, Mitarbeiter und Zeitraum filtern.
 4. Gesamtdauer berechnen und als CSV exportieren.
 
 Weitere Funktionen wie Timer, Benutzerverwaltung und Rollen können anschließend ergänzt werden.
@@ -43,7 +43,7 @@ Mandantenbezogene Angaben und Arbeitszeiten sind vertraulich. Bei der Umsetzung 
 
 ## Aktueller Stand – Version 0.1
 
-Die erste Web-App ist umgesetzt. Sie bietet Mandantenverwaltung, manuelle Zeiterfassung, Bearbeiten und Löschen von Einträgen, Mandanten- und Datumsfilter, Gesamtdauer und abrechenbare Dauer sowie CSV-Export der gefilterten Einträge. Tätigkeiten werden aus einer vordefinierten Liste ausgewählt.
+Die erste Web-App ist umgesetzt. Sie bietet Mandantenverwaltung, manuelle Zeiterfassung, Bearbeiten und Löschen von Einträgen, Mandanten-, Mitarbeiter- und Datumsfilter, Gesamtdauer und abrechenbare Dauer sowie CSV-Export der gefilterten Einträge. Tätigkeiten werden aus einer vordefinierten Liste ausgewählt.
 
 Die Oberfläche funktioniert auf Desktop und Smartphone. Die Daten werden im lokalen Browserspeicher (`localStorage`) gespeichert und bleiben beim Neuladen erhalten. Es gibt noch keine Anmeldung, gemeinsame Datenbank, Synchronisierung, Timer oder CSV-Importfunktion. Das Löschen der Browserdaten entfernt auch die Einträge; CSV-Exporte dienen der externen Sicherung und Weiterverarbeitung, können aber derzeit nicht wieder importiert werden. Verwenden Sie für diesen Prototyp ausschließlich fiktive Daten.
 
@@ -65,9 +65,11 @@ Auf dem eigenen Computer wechseln Sie stattdessen in den heruntergeladenen Proje
 3. Optional eine Leistungsbeschreibung ergänzen und die Abrechenbarkeit auswählen.
 4. „Eintrag speichern“ wählen. Die Übersicht und Summen aktualisieren sich sofort.
 5. Einträge bei Bedarf bearbeiten oder nach Bestätigung löschen.
-6. Die Übersicht nach Mandant oder Zeitraum filtern und die Auswahl als CSV exportieren.
+6. Die Übersicht nach Mandant, Mitarbeiter und Zeitraum filtern und die Auswahl als CSV exportieren.
 
 Die Summen beziehen sich immer auf die aktuelle Filterauswahl. Einträge und Mandantennamen werden als Text angezeigt. Der CSV-Export verwendet Semikolons und UTF-8 mit BOM; potenzielle Tabellenformeln werden als Text markiert.
+
+Der Mitarbeiterfilter bietet „Alle Mitarbeiter“ sowie die eindeutigen, alphabetisch sortierten Namen aus allen gespeicherten Zeiteinträgen. Mandanten-, Mitarbeiter- und Datumsfilter können gleichzeitig verwendet werden; die Datumsgrenzen sind eingeschlossen. Mitarbeiternamen werden genau wie gespeichert verglichen, einschließlich Groß-/Kleinschreibung und Leerzeichen. Vorhandene Einträge und das Speicherformat bleiben unverändert. Neue oder geänderte Namen erscheinen sofort in der Auswahl. Entfällt der letzte Eintrag eines ausgewählten Mitarbeiters durch Bearbeiten oder Löschen, bleibt der Filter aktiv und zeigt eine leere Auswertung. „Zurücksetzen“ entfernt alle Filter. Ohne passende Einträge ist der CSV-Export deaktiviert.
 
 ## Tests
 
@@ -75,7 +77,7 @@ Die Summen beziehen sich immer auf die aktuelle Filterauswahl. Einträge und Man
 npm test
 ```
 
-Die automatisierten Tests prüfen Eingabevalidierung, Mandanten- und Datumsfilter, Zeitberechnung und CSV-Maskierung. Der erste Entwicklungsstand wurde außerdem in Chromium mit Anlegen, Erfassen, Bearbeiten, Neuladen, Filtern, Exportieren und Löschen sowie mobiler Darstellung geprüft.
+Die automatisierten Tests prüfen Eingabevalidierung, Mandanten-, Mitarbeiter- und Datumsfilter, Zeitberechnung, CSV-Maskierung und die unveränderte Verarbeitung bestehender Einträge. Zusätzlich prüfen Integrationstests die tatsächlichen Ereignishandler aus `app.js` mit einer schlanken DOM-Simulation: Filterwechsel, Zurücksetzen, Summen, Mandantenauswertung, CSV-Download sowie das Anlegen, Umbenennen und Löschen von Mitarbeiternamen. Sie benötigen keine zusätzlichen Pakete. Eine visuelle Browserprüfung wird dadurch nicht ersetzt. Der erste Entwicklungsstand wurde außerdem in Chromium mit Anlegen, Erfassen, Bearbeiten, Neuladen, Filtern, Exportieren und Löschen sowie mobiler Darstellung geprüft.
 
 ## Nächste Ausbaustufen
 
