@@ -22,7 +22,7 @@
 <div class="client-section"><h3>Mandanten verwalten</h3><form id="client-form"><label>Neuer Mandant<input id="client-name" maxlength="120" placeholder="z. B. Muster GmbH" required></label><button class="secondary" type="submit">Mandant hinzufügen</button></form><p id="client-count" class="muted"></p></div>
 </section>
 <section class="panel records"><div class="section-heading"><div><h2>Leistungsübersicht</h2><p class="muted">Alle Einträge an einem Ort.</p></div><button class="secondary" id="export" type="button">CSV exportieren</button></div>
-<div class="filters"><label>Mandant<select id="filter-client"><option value="">Alle Mandanten</option></select></label><label>Von<input id="from" type="date"></label><label>Bis<input id="to" type="date"></label><button class="text-button" id="reset-filters" type="button">Zurücksetzen</button></div>
+<div class="filters"><label>Mandant<select id="filter-client"><option value="">Alle Mandanten</option></select></label><label>Mitarbeiter<select id="filter-employee"><option value="">Alle Mitarbeiter</option></select></label><label>Von<input id="from" type="date"></label><label>Bis<input id="to" type="date"></label><button class="text-button" id="reset-filters" type="button">Zurücksetzen</button></div>
 <div class="table-scroll"><table><thead><tr><th>Datum / Mandant</th><th>Leistung</th><th>Dauer</th><th>Aktionen</th></tr></thead><tbody id="entries"></tbody></table></div>
 <div id="empty" class="empty"><span>◷</span><h3>Noch keine Zeiten erfasst</h3><p>Legen Sie einen Mandanten an und erfassen Sie Ihre erste Leistung.</p></div>
 <div class="summary"><h3>Zeit je Mandant</h3><div id="client-summary"></div></div>

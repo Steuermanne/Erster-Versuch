@@ -12,8 +12,11 @@ export function validateEntry(entry,clients) {
   if (!entry.employee.trim()) throw new Error('Bitte einen Mitarbeiter angeben.');
   return entry;
 }
-export function filterEntries(entries,{clientId='',from='',to=''}={}) {
-  return entries.filter(e=>(!clientId||e.clientId===clientId)&&(!from||e.date>=from)&&(!to||e.date<=to)).sort((a,b)=>b.date.localeCompare(a.date));
+export function employeeNames(entries) {
+  return [...new Set(entries.map(e=>e.employee))].sort((a,b)=>a.localeCompare(b,'de'));
+}
+export function filterEntries(entries,{clientId='',employee='',from='',to=''}={}) {
+  return entries.filter(e=>(!clientId||e.clientId===clientId)&&(!employee||e.employee===employee)&&(!from||e.date>=from)&&(!to||e.date<=to)).sort((a,b)=>b.date.localeCompare(a.date));
 }
 export function totals(entries) {return {minutes:entries.reduce((s,e)=>s+e.minutes,0),billable:entries.filter(e=>e.billable).reduce((s,e)=>s+e.minutes,0)};}
 export function duration(minutes) {return `${Math.floor(minutes/60)} Std. ${minutes%60} Min.`;}

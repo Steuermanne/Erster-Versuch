@@ -1,4 +1,4 @@
-import {activities,today,validateEntry,filterEntries,totals,duration,csv} from './model.js';
+import {activities,today,validateEntry,employeeNames,filterEntries,totals,duration,csv} from './model.js';
 const $ = id=>document.getElementById(id);
 const key='kanzlei-zeit-v1';
 let state={clients:[],entries:[]}, editing=null, storageBroken=false;
@@ -10,9 +10,18 @@ try {
 function persist(next){if(storageBroken){message('Speicherung ist wegen eines Lesefehlers gesperrt.',true);return false;}try{localStorage.setItem(key,JSON.stringify(next));state=next;return true;}catch{message('Speichern fehlgeschlagen. Bitte den Browserspeicher prüfen. Ihre Eingaben wurden nicht gespeichert.',true);return false;}}
 function option(value,text){const o=document.createElement('option');o.value=value;o.textContent=text;return o;}
 function clientOptions(){for(const id of ['client','filter-client']){const select=$(id),old=select.value;select.replaceChildren(option('',id==='client'?'Bitte auswählen':'Alle Mandanten'));state.clients.forEach(c=>select.append(option(c.id,c.name)));select.value=old;}$('client-count').textContent=`${state.clients.length} Mandanten angelegt`;}
-function selected(){return filterEntries(state.entries,{clientId:$('filter-client').value,from:$('from').value,to:$('to').value});}
+function employeeOptions(){
+ const select=$('filter-employee'),old=select.value,names=employeeNames(state.entries);
+ select.replaceChildren(option('','Alle Mitarbeiter'));
+ names.forEach(name=>select.append(option(name,name)));
+ // Ein entfernter Name bleibt ausgewählt, bis der Filter bewusst geändert wird.
+ if(old&&!names.includes(old))select.append(option(old,`${old} (keine Einträge)`));
+ select.value=old;
+}
+function selected(){return filterEntries(state.entries,{clientId:$('filter-client').value,employee:$('filter-employee').value,from:$('from').value,to:$('to').value});}
 function text(tag,value,className){const el=document.createElement(tag);el.textContent=value;if(className)el.className=className;return el;}
 function render(){
+ employeeOptions();
  const entries=selected(),sum=totals(entries);$('total').textContent=duration(sum.minutes);$('billable').textContent=duration(sum.billable);$('count').textContent=entries.length;$('entries').replaceChildren();$('empty').hidden=entries.length>0;$('export').disabled=entries.length===0;
  if(!entries.length){$('empty').querySelector('h3').textContent=state.entries.length?'Keine passenden Einträge':'Noch keine Zeiten erfasst';$('empty').querySelector('p').textContent=state.entries.length?'Ändern Sie die Filter, um weitere Leistungen anzuzeigen.':'Legen Sie einen Mandanten an und erfassen Sie Ihre erste Leistung.';}
  for(const e of entries){const row=document.createElement('tr'),date=document.createElement('td'),service=document.createElement('td'),time=document.createElement('td'),actions=document.createElement('td');date.append(text('strong',state.clients.find(c=>c.id===e.clientId)?.name||'Unbekannt'),text('small',new Intl.DateTimeFormat('de-DE',{timeZone:'UTC'}).format(new Date(e.date))));service.append(text('strong',e.activity),text('small',e.employee),text('small',e.description,'description'));time.append(text('strong',duration(e.minutes)),text('small',e.billable?'Abrechenbar':'Nicht abrechenbar'));const edit=text('button','Bearbeiten','secondary');edit.type='button';edit.setAttribute('aria-label',`Eintrag für ${e.date} bearbeiten`);edit.onclick=()=>editEntry(e);const del=text('button','Löschen','secondary delete');del.type='button';del.setAttribute('aria-label',`Eintrag für ${e.date} löschen`);del.onclick=()=>{if(!confirm('Diesen Zeiteintrag wirklich löschen?'))return;if(persist({...state,entries:state.entries.filter(x=>x.id!==e.id)})){if(editing===e.id)resetForm();render();message('Eintrag gelöscht.');}};actions.append(edit,del);row.append(date,service,time,actions);$('entries').append(row);}
@@ -23,7 +32,7 @@ function editEntry(e){editing=e.id;for(const field of ['date','minutes','activit
 $('client-form').onsubmit=event=>{event.preventDefault();const name=$('client-name').value.trim();if(!name){message('Bitte einen Namen eingeben.',true);return;}if(state.clients.some(c=>c.name.toLocaleLowerCase('de')===name.toLocaleLowerCase('de'))){message('Dieser Mandant ist bereits angelegt.',true);return;}const client={id:crypto.randomUUID(),name};if(persist({...state,clients:[...state.clients,client]})){clientOptions();$('client').value=client.id;$('client-form').reset();render();message('Mandant angelegt.');}};
 $('entry-form').onsubmit=event=>{event.preventDefault();try{const entry=validateEntry({id:editing||crypto.randomUUID(),clientId:$('client').value,date:$('date').value,minutes:Number($('minutes').value),activity:$('activity').value,employee:$('employee').value.trim(),description:$('description').value.trim(),billable:$('billable-input').checked},state.clients);const entries=editing?state.entries.map(e=>e.id===editing?entry:e):[...state.entries,entry];if(persist({...state,entries})){resetForm();render();message('Zeiteintrag gespeichert.');}}catch(error){message(error.message,true);}};
 $('cancel').onclick=resetForm;
-for(const id of ['filter-client','from','to'])$(id).onchange=()=>{if($('from').value&&$('to').value&&$('from').value>$('to').value){message('Das Startdatum liegt nach dem Enddatum.',true);}else if(!storageBroken)message('');render();};
-$('reset-filters').onclick=()=>{$('filter-client').value='';$('from').value='';$('to').value='';render();};
+for(const id of ['filter-client','filter-employee','from','to'])$(id).onchange=()=>{if($('from').value&&$('to').value&&$('from').value>$('to').value){message('Das Startdatum liegt nach dem Enddatum.',true);}else if(!storageBroken)message('');render();};
+$('reset-filters').onclick=()=>{$('filter-client').value='';$('filter-employee').value='';$('from').value='';$('to').value='';render();};
 $('export').onclick=()=>{const blob=new Blob([csv(selected(),state.clients)],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`zeiterfassung-${today()}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message('CSV-Export erstellt. Er enthält die aktuell gefilterten Einträge.');};
 activities.forEach(a=>$('activity').append(option(a,a)));$('current-date').textContent=new Intl.DateTimeFormat('de-DE',{dateStyle:'full',timeZone:'Europe/Berlin'}).format(new Date());clientOptions();resetForm();render();
